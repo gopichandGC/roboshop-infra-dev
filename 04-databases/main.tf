@@ -158,3 +158,32 @@ module "rabbitmq" {
     }
   )
 }
+
+resource "null_resource" "rabbitmq" {
+  # Changes to any instance of the cluster requires re-provisioning
+  triggers = {
+    instance_id = module.rabbitmq.id
+  }
+
+  # Bootstrap script can run on any instance of the cluster
+  # So we just choose the first in this case
+  connection {
+    host = module.rabbitmq.private_ip
+    type = "ssh"
+    user = "centos"
+    password = "DevOps321"
+  }
+
+  provisioner "file" {
+    source      = "bootstrap.sh"
+    destination = "/tmp/bootstrap.sh"
+  }
+
+  provisioner "remote-exec" {
+    # Bootstrap script called with private_ip of each node in the cluster
+    inline = [
+      "chmod +x /tmp/bootstrap.sh",
+      "sudo sh /tmp/bootstrap.sh rabbitmq dev"
+    ]
+  }
+}
