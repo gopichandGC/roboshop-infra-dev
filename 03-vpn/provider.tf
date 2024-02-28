@@ -9,8 +9,7 @@ terraform {
     bucket = "techwithgopi-state-dev"
     key = "vpn"
     region="us-east-1"
-    dynamodb_table = "techwithgopi-locking-dev
-    "
+    dynamodb_table = "techwithgopi-locking-dev"
   }
   # if you give plan we get error stating that reconfigure using " terraform init -reconfigure "
 }
