@@ -28,7 +28,7 @@ module "catalogue" {
     var.tags
   )
 }
-
+# 2.Provision with ansible or shell
 resource "null_resource" "catalogue" {
   # Changes to any instance of the cluster requires re-provisioning
   triggers = {
@@ -57,15 +57,16 @@ resource "null_resource" "catalogue" {
     ]
   }
 }
-
+# 3.Stopping the instance
 resource "aws_ec2_instance_state" "catalogue" {
   instance_id = module.catalogue.id
   state       = "stopped"
   depends_on = [ null_resource.catalogue ]
 }
-
+#4.Take AMI from instance
 resource "aws_ami_from_instance" "catalogue" {
   name               = "${local.name}-${var.tags.Component}-${local.current_time}"
   source_instance_id = module.catalogue.id
   depends_on = [ aws_ec2_instance_state.catalogue ]
 }
+#5.Delete the instance
