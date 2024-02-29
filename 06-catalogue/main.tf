@@ -85,3 +85,22 @@ resource "null_resource" "catalogue_delete" {
 }
 
 #6. Create Launch Template with AMI
+resource "aws_launch_template" "catalogue" {
+  name = "${local.name}-${var.tags.Component}"
+
+  image_id = aws_ami_from_instance.catalogue.id
+  instance_initiated_shutdown_behavior = "terminate"
+  instance_type = "t2.micro"
+  update_default_version = true
+
+  vpc_security_group_ids = [data.aws_ssm_parameter.catalogue_sg_id.value]
+
+  tag_specifications {
+    resource_type = "instance"
+
+    tags = {
+      Name = "${local.name}-${var.tags.Component}"
+    }
+  }
+
+}
