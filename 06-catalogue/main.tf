@@ -57,3 +57,9 @@ resource "null_resource" "catalogue" {
     ]
   }
 }
+
+resource "aws_ec2_instance_state" "catalogue" {
+  instance_id = module.catalogue.id
+  state       = "stopped"
+  depends_on = [ null_resource.catalogue ]
+}
