@@ -139,3 +139,20 @@ resource "aws_autoscaling_group" "catalogue" {
     delete = "15m"
   }
 }
+
+resource "aws_lb_listener_rule" "catalogue" {
+  listener_arn = data.aws_ssm_parameter.app_alb_listener_arn.value
+  priority     = 10
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.catalogue.arn
+  }
+
+
+  condition {
+    host_header {
+      values = ["${var.tags.Component}.app-${var.environment}.${var.zone_name}"]
+    }
+  }
+}
