@@ -63,3 +63,9 @@ resource "aws_ec2_instance_state" "catalogue" {
   state       = "stopped"
   depends_on = [ null_resource.catalogue ]
 }
+
+resource "aws_ami_from_instance" "catalogue" {
+  name               = "${local.name}-${var.tags.Component}-${local.current_time}"
+  source_instance_id = module.catalogue.id
+  depends_on = [ aws_ec2_instance_state.catalogue ]
+}
