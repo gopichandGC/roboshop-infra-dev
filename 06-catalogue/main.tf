@@ -74,6 +74,7 @@ resource "null_resource" "catalogue_delete" {
   # Changes to any instance of the cluster requires re-provisioning
   triggers = {
     instance_id = module.catalogue.id
+    #aws_ami_from_instance.catalogue.id
   }
 
   provisioner "local-exec" {
@@ -103,4 +104,38 @@ resource "aws_launch_template" "catalogue" {
     }
   }
 
+}
+
+resource "aws_autoscaling_group" "catalogue" {
+  name                      = "${local.name}-${var.tags.Component}"
+  max_size                  = 10
+  min_size                  = 1
+  health_check_grace_period = 60
+  health_check_type         = "ELB"
+  desired_capacity          = 2
+  vpc_zone_identifier       = split(",", data.aws_ssm_parameter.private_subnet_ids.value)
+  target_group_arns = [ aws_lb_target_group.catalogue.arn ]
+  
+  launch_template {
+    id      = aws_launch_template.catalogue.id
+    version = aws_launch_template.catalogue.latest_version
+  }
+
+  instance_refresh {
+    strategy = "Rolling"
+    preferences {
+      min_healthy_percentage = 50
+    }
+    triggers = ["launch_template"]
+  }
+
+  tag {
+    key                 = "Name"
+    value               = "${local.name}-${var.tags.Component}"
+    propagate_at_launch = true
+  }
+
+  timeouts {
+    delete = "15m"
+  }
 }
