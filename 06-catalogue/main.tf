@@ -70,3 +70,18 @@ resource "aws_ami_from_instance" "catalogue" {
   depends_on = [ aws_ec2_instance_state.catalogue ]
 }
 #5.Delete the instance
+resource "null_resource" "catalogue_delete" {
+  # Changes to any instance of the cluster requires re-provisioning
+  triggers = {
+    instance_id = module.catalogue.id
+  }
+
+  provisioner "local-exec" {
+    # Bootstrap script called with private_ip of each node in the cluster
+    command = "aws ec2 terminate-instances --instance-ids ${module.catalogue.id}"
+  }
+
+  depends_on = [ aws_ami_from_instance.catalogue]
+}
+
+#6. Create Launch Template with AMI
