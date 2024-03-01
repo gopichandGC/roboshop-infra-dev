@@ -57,3 +57,49 @@ resource "null_resource" "web" {
     ]
   }
 }
+
+resource "aws_ec2_instance_state" "web" {
+  instance_id = module.web.id
+  state       = "stopped"
+  depends_on = [ null_resource.web ]
+}
+
+resource "aws_ami_from_instance" "web" {
+  name               = "${local.name}-${var.tags.Component}-${local.current_time}"
+  source_instance_id = module.web.id
+  depends_on = [ aws_ec2_instance_state.web ]
+}
+
+resource "null_resource" "web_delete" {
+  # Changes to any instance of the cluster requires re-provisioning
+  triggers = {
+    instance_id = module.web.id
+  }
+
+  provisioner "local-exec" {
+    # Bootstrap script called with private_ip of each node in the cluster
+    command = "aws ec2 terminate-instances --instance-ids ${module.web.id}"
+  }
+
+  depends_on = [ aws_ami_from_instance.web]
+}
+
+resource "aws_launch_template" "web" {
+  name = "${local.name}-${var.tags.Component}"
+
+  image_id = aws_ami_from_instance.web.id
+  instance_initiated_shutdown_behavior = "terminate"
+  instance_type = "t2.micro"
+  update_default_version = true
+
+  vpc_security_group_ids = [data.aws_ssm_parameter.web_sg_id.value]
+
+  tag_specifications {
+    resource_type = "instance"
+
+    tags = {
+      Name = "${local.name}-${var.tags.Component}"
+    }
+  }
+
+}
