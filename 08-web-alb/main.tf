@@ -1,5 +1,5 @@
 resource "aws_lb" "web_alb" {
-  name               = "${local.name}-${var.tags.Component}" #roboshop-dev-app-alb
+  name               = "${local.name}-${var.tags.Component}" #roboshop-dev-web-alb
   internal           = false
   load_balancer_type = "application"
   security_groups    = [data.aws_ssm_parameter.web_alb_sg_id.value]
