@@ -137,7 +137,14 @@ resource "aws_security_group_rule" "app_alb_vpn" {
   security_group_id        = module.app_alb.sg_id
 }
 
-
+resource "aws_security_group_rule" "web_alb_internet" {
+  cidr_blocks = ["0.0.0.0/0"]
+  type                     = "ingress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  security_group_id        = module.web_alb.sg_id
+}
 #openvpn
 resource "aws_security_group_rule" "vpn_home" {
   security_group_id = module.vpn.sg_id
