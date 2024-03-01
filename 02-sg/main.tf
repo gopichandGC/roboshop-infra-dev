@@ -137,6 +137,15 @@ resource "aws_security_group_rule" "app_alb_vpn" {
   security_group_id        = module.app_alb.sg_id
 }
 
+resource "aws_security_group_rule" "app_alb_web" {
+  source_security_group_id = module.web.sg_id
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  security_group_id        = module.app_alb.sg_id
+}
+
 resource "aws_security_group_rule" "web_alb_internet" {
   cidr_blocks = ["0.0.0.0/0"]
   type                     = "ingress"
