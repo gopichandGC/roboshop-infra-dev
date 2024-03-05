@@ -34,3 +34,20 @@ resource "aws_cloudfront_distribution" "daws76s" {
     minimum_protocol_version = "TLSv1.2_2021"
   }
 }
+
+module "records" {
+  source  = "terraform-aws-modules/route53/aws//modules/records"
+
+  zone_name = var.zone_name
+
+  records = [
+    {
+      name    = "web-cdn"
+      type    = "A"
+      alias   = {
+        name    = aws_cloudfront_distribution.daws76s.domain_name
+        zone_id = aws_cloudfront_distribution.daws76s.hosted_zone_id
+      }
+    }
+  ]
+}
