@@ -146,6 +146,49 @@ resource "aws_security_group_rule" "app_alb_web" {
   security_group_id        = module.app_alb.sg_id
 }
 
+resource "aws_security_group_rule" "app_alb_user" {
+  source_security_group_id = module.user.sg_id
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  security_group_id        = module.app_alb.sg_id
+}
+resource "aws_security_group_rule" "app_alb_cart" {
+  source_security_group_id = module.cart.sg_id
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  security_group_id        = module.app_alb.sg_id
+}
+
+resource "aws_security_group_rule" "app_alb_shipping" {
+  source_security_group_id = module.shipping.sg_id
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  security_group_id        = module.app_alb.sg_id
+}
+resource "aws_security_group_rule" "app_alb_catalogue" {
+  source_security_group_id = module.catalogue.sg_id
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  security_group_id        = module.app_alb.sg_id
+}
+
+resource "aws_security_group_rule" "app_alb_payment" {
+  source_security_group_id = module.payment.sg_id
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  security_group_id        = module.app_alb.sg_id
+}
+
 resource "aws_security_group_rule" "web_alb_internet" {
   cidr_blocks = ["0.0.0.0/0"]
   type                     = "ingress"
@@ -154,6 +197,7 @@ resource "aws_security_group_rule" "web_alb_internet" {
   protocol                 = "tcp"
   security_group_id        = module.web_alb.sg_id
 }
+
 #openvpn
 resource "aws_security_group_rule" "vpn_home" {
   security_group_id = module.vpn.sg_id
